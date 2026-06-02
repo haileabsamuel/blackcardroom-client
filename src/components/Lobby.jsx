@@ -33,7 +33,7 @@ const BTN = ({ children, onClick, variant = 'default', disabled, full }) => (
 
 export function Lobby() {
   const { playerName, avatar, room, mySeat, loading, lastError,
-    setPlayerName, setAvatar, createRoom, joinRoom, setReady, connect } = useGameStore();
+    setPlayerName, setAvatar, createRoom, joinRoom, setReady, hostStartGame, connect } = useGameStore();
 
   const [screen, setScreen] = useState('home');
   const [selectedGame, setSelectedGame] = useState('spades');
@@ -98,13 +98,28 @@ export function Lobby() {
             ))}
           </div>
 
-          <BTN variant="primary" full disabled={room.players?.find(p => p.seat === mySeat)?.ready} onClick={setReady}>
+          {/* Ready button */}
+          <BTN variant="primary" full
+            disabled={room.players?.find(p => p.seat === mySeat)?.ready}
+            onClick={setReady}>
             {room.players?.find(p => p.seat === mySeat)?.ready ? '✓ Ready!' : "I'm Ready"}
           </BTN>
 
+          {/* Host start button — shown when host is ready and 2+ players joined */}
+          {isHost && room.players?.length >= 2 && (
+            <div style={{ marginTop: 10 }}>
+              <BTN variant="gold" full onClick={hostStartGame}>
+                🃏 Start Game Now
+              </BTN>
+              <div style={{ marginTop: 8, fontSize: 12, color: '#555', textAlign: 'center' }}>
+                As host you can start even if not all players clicked ready
+              </div>
+            </div>
+          )}
+
           {lastError && <div style={{ marginTop: 12, color: '#f07070', fontSize: 14, textAlign: 'center' }}>⚠️ {lastError}</div>}
           <div style={{ marginTop: 14, fontSize: 13, color: '#444', textAlign: 'center' }}>
-            {isHost ? 'Game starts when all players are ready' : 'Waiting for host to start...'}
+            {isHost ? 'All players ready? Hit Start Game!' : 'Waiting for host to start...'}
           </div>
         </div>
       </div>
